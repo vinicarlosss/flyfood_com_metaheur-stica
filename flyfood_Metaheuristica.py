@@ -1,4 +1,5 @@
 import random
+from functools import  reduce
 
 
 def modulo(termOne, termTwo):  # Função para determinar o módulo das distâncias
@@ -17,7 +18,7 @@ def funcaoCusto(individuos,coordenadas, modulo, distancia):  # cálculo do custo
     custoindividuos = [0 for _ in range(len(individuos))]
     contador = 0
     maiorcusto = 0
-    while contador < 10:
+    while contador < len(individuos):
         custo = 0
         # O laço for faz uma iteração definindo i como cada ponto de entrega do possível melhor circuito.
         for i in individuos[contador]:
@@ -67,6 +68,57 @@ def funcaoAptidao(custos, individuos):  # função para calcular a aptidão dos 
         aptidoes[i] = (custos[i]*-1) + custos[len(individuos)]
     return aptidoes
 
+def soma(a,b):
+    return a+b
+
+def trataNumero(numero):
+    subtraendo = numero.__floor__()
+    if numero - subtraendo >= 0.75:
+        return numero.__ceil__()
+    return numero.__floor__()
+
+
+def roleta(aptidao, individuos):  # função para seleção dos indivíduos que vão se reproduzir
+    opcoesroleta = [0 for _ in range(100)]
+    total = reduce(soma, aptidao)
+    percentuais = [0 for _ in range(len(individuos))]
+    for i in range(len(aptidao)):
+        valorPercentual = ((aptidao[i]/total)*100)
+        percentuais[i] = trataNumero(valorPercentual)
+
+    index = 0
+    contador = 0
+    while True:
+
+        if index == len(individuos):
+            break
+        elif percentuais[index] != 0:
+            for i in range(percentuais[index]):
+                opcoesroleta[contador] = individuos[index]
+                contador += 1
+
+        index += 1
+
+    individuosselecionados = [0 for _ in range(len(individuos))]
+    contador = 0
+    while True:
+        numeroaleatorio = random.randint(0,99)
+        if contador == len(individuosselecionados):
+            break
+        elif opcoesroleta[numeroaleatorio] != 0:
+            individuosselecionados[contador] = opcoesroleta[numeroaleatorio]
+            contador += 1
+
+    return individuosselecionados
+
+
+def cruzamento(individuos):
+    contador = 0
+    while contador <= len(individuos)-2:
+        paium = individuos[contador]
+        paidois = individuos[contador+1]
+
+        contador += 2
 
 def criarPopulacaoInicial(individuos):  # função de criação da população inicial
     populacao = [[0 for _ in range(len(individuos))] for _ in range(10)]
@@ -77,6 +129,7 @@ def criarPopulacaoInicial(individuos):  # função de criação da população i
             index = random.randint(0, len(copiaIndividuos) - 1)
             populacao[contador][i] = copiaIndividuos[index]
             copiaIndividuos.remove(copiaIndividuos[index])
+
         contador += 1
     return populacao
 
@@ -104,5 +157,6 @@ arquivo.close()
 populacaoInicial = criarPopulacaoInicial(pontos_entrega)
 custos = funcaoCusto(populacaoInicial, coordenadas, modulo, distancia)
 aptidao = funcaoAptidao(custos, populacaoInicial)
-
+individuosparareproduzir = roleta(aptidao, populacaoInicial)
+print(cruzamento(individuosparareproduzir))
 
