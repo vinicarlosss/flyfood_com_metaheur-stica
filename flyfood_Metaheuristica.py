@@ -113,12 +113,174 @@ def roleta(aptidao, individuos):  # função para seleção dos indivíduos que 
 
 
 def cruzamento(individuos):
+    individuosfilhos = []
     contador = 0
-    while contador <= len(individuos)-2:
-        paium = individuos[contador]
-        paidois = individuos[contador+1]
+    listaparceiros = [0 for _ in range(int(len(individuos)/2))]
+    while True:
+        if contador == len(listaparceiros):
+            break
+        else:
+            numeroaleatorio = random.randint(0,len(individuos)-1)
+            listaparceiros[contador] = individuos[numeroaleatorio]
+            individuos.remove(individuos[numeroaleatorio])
+            contador += 1
+    contador = 0
+    while True:
+        pontocorte = [random.randint(0, (len(individuos[0])-1)),random.randint(0, (len(individuos[0])-1))]
 
-        contador += 2
+        if pontocorte[0] != pontocorte[1]:
+            pontocorte.sort()
+            break
+    while contador <= len(individuos) - 1:
+        paium = individuos[contador].copy()
+        paidois = listaparceiros[contador].copy()
+        filhoum = [0 for _ in range(len(paium))]
+        filhodois = [0 for _ in range(len(paidois))]
+        mapeamentos = []
+        contadordois = pontocorte[0]
+        while True:
+            if contadordois > pontocorte[1]:
+                break
+            filhoum[contadordois] = paidois[contadordois]
+            filhodois[contadordois] = paium[contadordois]
+            mapeamentos.append([paium[contadordois], paidois[contadordois]])
+            contadordois += 1
+        contadordois = 0
+        while contadordois < len(filhoum): # filho 1
+            if filhoum[contadordois] == 0:
+                if paium[contadordois] not in filhoum: # se o gene do pai não estiver no filho, adicione
+                    filhoum[contadordois] = paium[contadordois]
+                else:  # se não estiver procure nos mapeamentos
+                    for i in mapeamentos:
+                        if i[0] == paium[contadordois]:
+                            referencia = i[1]
+                            if referencia not in filhoum:
+                                filhoum[contadordois] = referencia
+                            else:
+                                index = 0
+                                mapeamentos2 = mapeamentos.copy()
+                                mapeamentos2.remove(i)
+                                while True:
+                                    if mapeamentos2[index][0] == referencia and mapeamentos2[index][1] not in filhoum:
+                                        filhoum[contadordois] = mapeamentos2[index][1]
+                                        break
+                                    elif mapeamentos2[index][1] == referencia and mapeamentos2[index][0] not in filhoum:
+                                        filhoum[contadordois] = mapeamentos2[index][0]
+                                        break
+                                    elif mapeamentos2[index][0] == referencia and mapeamentos2[index][0] in filhoum:
+                                        referencia = mapeamentos2[index][1]
+                                        mapeamentos2.remove(mapeamentos2[index])
+                                        index = -1
+                                    elif mapeamentos2[index][1] == referencia and mapeamentos2[index][1] in filhoum:
+                                        referencia = mapeamentos2[index][0]
+                                        mapeamentos2.remove(mapeamentos2[index])
+                                        index = -1
+                                index += 1
+                            break
+                        elif i[1] == paium[contadordois]:
+                            referencia = i[0]
+                            if referencia not in filhoum:
+                                filhoum[contadordois] = referencia
+                            else:
+                                index = 0
+                                mapeamentos2 = mapeamentos.copy()
+                                mapeamentos2.remove(i)
+                                while True:
+                                    if mapeamentos2[index][0] == referencia and mapeamentos2[index][1] not in filhoum:
+                                        filhoum[contadordois] = mapeamentos2[index][1]
+                                        break
+                                    elif mapeamentos2[index][1] == referencia and mapeamentos2[index][0] not in filhoum:
+                                        filhoum[contadordois] = mapeamentos2[index][0]
+                                        break
+                                    elif mapeamentos2[index][0] == referencia and mapeamentos2[index][0] in filhoum:
+                                        referencia = mapeamentos2[index][1]
+                                        mapeamentos2.remove(mapeamentos2[index])
+                                        index = -1
+                                    elif mapeamentos2[index][1] == referencia and mapeamentos2[index][1] in filhoum:
+                                        referencia = mapeamentos2[index][0]
+                                        mapeamentos2.remove(mapeamentos2[index])
+                                        index = -1
+
+                                    index += 1
+                            break
+
+            contadordois += 1
+        contadordois = 0
+        while contadordois < len(filhodois): # filho 2
+            if filhodois[contadordois] == 0: # se o filho não tiver gene nessa posição
+                if paidois[contadordois] not in filhodois: # se o gene do pai dois não estiver no filho dois, adicione
+                    filhodois[contadordois] = paidois[contadordois]
+                else: # se o gene já estiver no filho dois, procure nos mapeamentos com qual gene esse gene foi mapeado no ponto de corte
+                    for i in mapeamentos:
+                        if i[0] == paidois[contadordois]: # se o primeiro item dos mapeamentos é igual o gene que está sendo procurado a referência é o outro item
+                            referencia = i[1]
+                            if referencia not in filhodois: # se a referencia não estiver no filho dois, adicione ele
+                                filhodois[contadordois] = referencia
+                            else: # se estiver no filho dois vamos procurar nos mapeamentos novamente o gene mapeado com a referência
+                                index = 0
+                                mapeamentos2 = mapeamentos.copy()
+                                mapeamentos2.remove(i)
+                                while True:
+                                    if mapeamentos2[index][0] == referencia and mapeamentos2[index][1] not in filhodois:
+                                        filhodois[contadordois] = mapeamentos2[index][1]
+                                        break
+                                    elif mapeamentos2[index][1] == referencia and mapeamentos2[index][0] not in filhodois:
+                                        filhodois[contadordois] = mapeamentos2[index][0]
+                                        break
+                                    elif mapeamentos2[index][0] == referencia and mapeamentos2[index][0] in filhodois:
+                                        referencia = mapeamentos2[index][1]
+                                        mapeamentos2.remove(mapeamentos2[index])
+                                        index = -1
+                                    elif mapeamentos2[index][1] == referencia and mapeamentos2[index][1] in filhodois:
+                                        referencia = mapeamentos2[index][0]
+                                        mapeamentos2.remove(mapeamentos2[index])
+                                        index = -1
+                                    index += 1
+                            break
+                        elif i[1] == paidois[contadordois]:
+                            referencia = i[0]
+                            if referencia not in filhodois:
+                                filhodois[contadordois] = referencia
+                            else:
+                                index = 0
+                                mapeamentos2 = mapeamentos.copy()
+                                mapeamentos2.remove(i)
+                                while True:
+                                    if mapeamentos2[index][0] == referencia and mapeamentos2[index][1] not in filhodois:
+                                        filhodois[contadordois] = mapeamentos2[index][1]
+                                        break
+                                    elif mapeamentos2[index][1] == referencia and mapeamentos2[index][0] not in filhodois:
+                                        filhodois[contadordois] = mapeamentos2[index][0]
+                                        break
+                                    elif mapeamentos2[index][0] == referencia and mapeamentos2[index][0] in filhodois:
+                                        referencia = mapeamentos2[index][1]
+                                        mapeamentos2.remove(mapeamentos2[index])
+                                        index = -1
+                                    elif mapeamentos2[index][1] == referencia and mapeamentos2[index][1] in filhodois:
+                                        referencia = mapeamentos2[index][0]
+                                        mapeamentos2.remove(mapeamentos2[index])
+                                        index = -1
+                                    index += 1
+                            break
+            contadordois += 1
+        individuosfilhos.append(filhoum)
+        individuosfilhos.append(filhodois)
+        contador += 1
+
+    return individuosfilhos
+
+
+def mutacao(individuos):
+    for i in individuos:
+        taxamutacao = random.randint(1,10)
+        if taxamutacao > 7:
+            primeirogene = random.randint(0, len(i)-1)
+            segundogene = random.randint(0, len(i) - 1)
+            geneescolhido = i[primeirogene]
+            i[primeirogene] = i[segundogene]
+            i[segundogene] = geneescolhido
+    return individuos
+
 
 def criarPopulacaoInicial(individuos):  # função de criação da população inicial
     populacao = [[0 for _ in range(len(individuos))] for _ in range(10)]
@@ -158,5 +320,22 @@ populacaoInicial = criarPopulacaoInicial(pontos_entrega)
 custos = funcaoCusto(populacaoInicial, coordenadas, modulo, distancia)
 aptidao = funcaoAptidao(custos, populacaoInicial)
 individuosparareproduzir = roleta(aptidao, populacaoInicial)
-print(cruzamento(individuosparareproduzir))
+print(reduce(soma, custos))
+contador = 0
+individuoscruzados = cruzamento(individuosparareproduzir)
+individuosmutados = mutacao(individuoscruzados)
+while contador < 20:
+    populacao = individuosmutados
+    custos = funcaoCusto(populacao, coordenadas, modulo, distancia)
+    aptidao = funcaoAptidao(custos, populacao)
+    individuosparareproduzir = roleta(aptidao, populacao)
+    individuoscruzados = cruzamento(individuosparareproduzir)
+    individuosmutados = mutacao(individuoscruzados)
+    print(reduce(soma, custos))
+    contador += 1
+
+
+
+
+
 
