@@ -280,60 +280,6 @@ def mutacao(individuos):
             i[segundogene] = geneescolhido
     return individuos
 
-def elistismo(individuos, custos):
-    melhoresindividuos = []
-    for i in range(len(individuos)):
-        if i == 0:
-            topum = i
-            topdois = i+1
-            toptres = i + 2
-            topquatro = i + 3
-        else:
-            if custos[i] < custos[topum]:
-                topum = i
-            elif custos[i] < custos[topdois]:
-                topdois = i
-            elif custos[i] < custos[toptres]:
-                toptres = i
-            elif custos[i] < custos[topquatro]:
-                topquatro = i
-    melhoresindividuos.append([individuos[topum],custos[topum]])
-    melhoresindividuos.append([individuos[topdois], custos[topdois]])
-    melhoresindividuos.append([individuos[toptres], custos[toptres]])
-    melhoresindividuos.append([individuos[topquatro], custos[topquatro]])
-    return melhoresindividuos
-
-
-def trocarOsPioresPorElitismo(individuos, custos, elistismo):
-    for i in range(len(individuos)):
-        if i == 0:
-            topum = i
-            topdois = i+1
-            toptres = i + 2
-            topquatro = i + 3
-        else:
-            if custos[i] > custos[topum]:
-                topum = i
-            elif custos[i] > custos[topdois]:
-                topdois = i
-            elif custos[i] > custos[toptres]:
-                toptres = i
-            elif custos[i] > custos[topquatro]:
-                topquatro = i
-    if custos[topum] > elistismo[0][1]:
-        individuos[topum] = elistismo[0][0]
-        custos[topum] = elistismo[0][1]
-    if custos[topdois] > elistismo[1][1]:
-        individuos[topdois] = elistismo[1][0]
-        custos[topdois] = elistismo[1][1]
-    if custos[toptres] > elistismo[2][1]:
-        individuos[toptres] = elistismo[2][0]
-        custos[toptres] = elistismo[2][1]
-    if custos[topquatro] > elistismo[3][1]:
-        individuos[topquatro] = elistismo[3][0]
-        custos[topquatro] = elistismo[3][1]
-
-
 
 def criarPopulacaoInicial(individuos):  # função de criação da população inicial
     populacao = [[0 for _ in range(len(individuos))] for _ in range(100)]
@@ -375,6 +321,7 @@ def mostrarResultado(melhorindividuo):
     plt.plot(x, y, ".")
     plt.show()
 
+
 arquivo = open('matriz.txt', 'r')
 pontos_entrega = []  # array para armazenar os pontos de entrega
 circuitos = []  # array para armazenar todos os possíveis circuitos a serem realizados
@@ -405,34 +352,26 @@ aptidao = funcaoAptidao(custos, populacaoInicial)
 individuosparareproduzir = roleta(aptidao, populacaoInicial.copy())
 individuoscruzados = cruzamento(individuosparareproduzir.copy())
 individuosmutados = mutacao(individuoscruzados.copy())
-contador = 0
 gereacoessemindividuomelhor = 0
-melhorindividuo = []
+melhorindividuo = checaMinimo(populacaoInicial, custos)
 while True:
 
     populacao = individuosmutados
     custos = funcaoCusto(populacao, coordenadas, modulo, distancia)
     aptidao = funcaoAptidao(custos, populacao)
+    melhorindividuodessageracao = checaMinimo(populacao, custos)
+    if melhorindividuodessageracao[1] < melhorindividuo[1]:
+        gereacoessemindividuomelhor = 0
+        melhorindividuo = melhorindividuodessageracao
+    else:
+        gereacoessemindividuomelhor += 1
+    if gereacoessemindividuomelhor == 100:
+        mostrarResultado(melhorindividuo)
+        break
+
     individuosparareproduzir = roleta(aptidao, populacao.copy())
     individuoscruzados = cruzamento(individuosparareproduzir.copy())
     individuosmutados = mutacao(individuoscruzados.copy())
-    custos = funcaoCusto(populacao, coordenadas, modulo, distancia)
-    if contador > 0:
-        trocarOsPioresPorElitismo(individuosmutados, custos, individuossuperdotados)
-        if contador == 1:
-            melhorindividuo = checaMinimo(populacao, custos)
-        else:
-            melhorindividuodessageracao = checaMinimo(populacao, custos)
-            if melhorindividuodessageracao[1] < melhorindividuo[1]:
-                gereacoessemindividuomelhor = 0
-                melhorindividuo = melhorindividuodessageracao
-            else:
-                gereacoessemindividuomelhor += 1
-            if gereacoessemindividuomelhor == 100:
-                mostrarResultado(melhorindividuo)
-                break
-    individuossuperdotados = elistismo(individuosmutados,custos)
-    contador += 1
 
 
 
