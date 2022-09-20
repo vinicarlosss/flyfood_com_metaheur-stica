@@ -10,11 +10,11 @@ def modulo(termOne, termTwo):  # Função para determinar o módulo das distânc
     return resultado
 
 
-def distancia(termOne, termTwo):  # Função para determinar a distância entre dois pontos de entrega
-    return termOne + termTwo
+def soma(a,b):
+    return a+b
 
 
-def funcaoCusto(individuos,coordenadas, modulo, distancia):  # cálculo do custo da solução
+def funcaoCusto(individuos,coordenadas, modulo, soma):  # cálculo do custo da solução
     custoindividuos = [0 for _ in range(len(individuos))]
     contador = 0
     maiorcusto = 0
@@ -28,7 +28,7 @@ def funcaoCusto(individuos,coordenadas, modulo, distancia):  # cálculo do custo
                 yOne = coordenadas['R'][1]
                 xTwo = coordenadas[f'{i}'][0]
                 yTwo = coordenadas[f'{i}'][1]
-                custo += distancia(modulo(xOne,xTwo), modulo(yOne, yTwo))
+                custo += soma(modulo(xOne,xTwo), modulo(yOne, yTwo))
                 entregaAtual = i
             # Até o penúltimo ponto de entrega contabilizamos a distância indo do ponto de entrega atual(que no caso é o
             # da interação anterior) até o ponto de entrega que está na vez.
@@ -37,7 +37,7 @@ def funcaoCusto(individuos,coordenadas, modulo, distancia):  # cálculo do custo
                 yOne = coordenadas[f'{entregaAtual}'][1]
                 xTwo = coordenadas[f'{i}'][0]
                 yTwo = coordenadas[f'{i}'][1]
-                custo += distancia(modulo(xOne, xTwo), modulo(yOne, yTwo))
+                custo += soma(modulo(xOne, xTwo), modulo(yOne, yTwo))
                 entregaAtual = i
             # Quando chegamos no penultimo ponto, contabilizamos a distância do penúltimo  ponto de entrega até
             # o ultimo e depois do último ponto até o restaurante.
@@ -46,12 +46,12 @@ def funcaoCusto(individuos,coordenadas, modulo, distancia):  # cálculo do custo
                 yOne = coordenadas[f'{entregaAtual}'][1]
                 xTwo = coordenadas[f'{i}'][0]
                 yTwo = coordenadas[f'{i}'][1]
-                custo += distancia(modulo(xOne, xTwo), modulo(yOne, yTwo))
+                custo += soma(modulo(xOne, xTwo), modulo(yOne, yTwo))
                 xOne = coordenadas[f'{i}'][0]
                 yOne = coordenadas[f'{i}'][1]
                 xTwo = coordenadas['R'][0]
                 yTwo = coordenadas['R'][1]
-                custo += distancia(modulo(xOne, xTwo), modulo(yOne, yTwo))
+                custo += soma(modulo(xOne, xTwo), modulo(yOne, yTwo))
                 if contador == 0:
                     maiorcusto = custo
                 else:
@@ -67,9 +67,6 @@ def funcaoAptidao(custos, individuos):  # função para calcular a aptidão dos 
     for i in range(len(individuos)):
         aptidoes[i] = (custos[i]*-1) + custos[len(individuos)]
     return aptidoes
-
-def soma(a,b):
-    return a+b
 
 
 def roleta(aptidao, individuos):  # função para seleção dos indivíduos que vão se reproduzir
@@ -146,21 +143,21 @@ def cruzamento(individuos):
             contadordois += 1
         contadordois = 0
         while contadordois < len(filhoum): # filho 1
-            if filhoum[contadordois] == 0:
-                if paium[contadordois] not in filhoum: # se o gene do pai não estiver no filho, adicione
+            if filhoum[contadordois] == 0: # se o filho não tiver gene nessa posição
+                if paium[contadordois] not in filhoum: # se o gene do pai dois não estiver no filho dois, adicione
                     filhoum[contadordois] = paium[contadordois]
-                else:  # se não estiver procure nos mapeamentos
+                else:  # se o gene já estiver no filho dois, procure nos mapeamentos com qual gene esse gene foi mapeado no ponto de corte
                     index = 0
                     mapeamentos2 = mapeamentos.copy()
                     referencia = paium[contadordois]
                     while True:
-                        if mapeamentos2[index][0] == referencia and mapeamentos2[index][1] not in filhoum:
+                        if mapeamentos2[index][0] == referencia and mapeamentos2[index][1] not in filhoum: # encontrado
                             filhoum[contadordois] = mapeamentos2[index][1]
                             break
                         elif mapeamentos2[index][1] == referencia and mapeamentos2[index][0] not in filhoum:
                             filhoum[contadordois] = mapeamentos2[index][0]
                             break
-                        elif mapeamentos2[index][0] == referencia and mapeamentos2[index][0] in filhoum:
+                        elif mapeamentos2[index][0] == referencia and mapeamentos2[index][0] in filhoum:# encontrado mas já está no filho
                             referencia = mapeamentos2[index][1]
                             mapeamentos2.remove(mapeamentos2[index])
                             index = -1
@@ -180,13 +177,13 @@ def cruzamento(individuos):
                     mapeamentos2 = mapeamentos.copy()
                     referencia = paidois[contadordois]
                     while True:
-                        if mapeamentos2[index][0] == referencia and mapeamentos2[index][1] not in filhodois:
+                        if mapeamentos2[index][0] == referencia and mapeamentos2[index][1] not in filhodois:  # encontrado
                             filhodois[contadordois] = mapeamentos2[index][1]
                             break
                         elif mapeamentos2[index][1] == referencia and mapeamentos2[index][0] not in filhodois:
                             filhodois[contadordois] = mapeamentos2[index][0]
                             break
-                        elif mapeamentos2[index][0] == referencia and mapeamentos2[index][0] in filhodois:
+                        elif mapeamentos2[index][0] == referencia and mapeamentos2[index][0] in filhodois:  # encontrado mas já está no filho
                             referencia = mapeamentos2[index][1]
                             mapeamentos2.remove(mapeamentos2[index])
                             index = -1
@@ -281,7 +278,7 @@ for linha in arquivo:
 
 arquivo.close()
 populacaoInicial = criarPopulacaoInicial(pontos_entrega)
-custos = funcaoCusto(populacaoInicial, coordenadas, modulo, distancia)
+custos = funcaoCusto(populacaoInicial, coordenadas, modulo, soma)
 aptidao = funcaoAptidao(custos, populacaoInicial)
 individuosparareproduzir = roleta(aptidao, populacaoInicial.copy())
 individuoscruzados = cruzamento(individuosparareproduzir.copy())
@@ -291,7 +288,7 @@ melhorindividuo = checaMinimo(populacaoInicial, custos)
 while True:
 
     populacao = individuosmutados
-    custos = funcaoCusto(populacao, coordenadas, modulo, distancia)
+    custos = funcaoCusto(populacao, coordenadas, modulo, soma)
     aptidao = funcaoAptidao(custos, populacao)
     melhorindividuodessageracao = checaMinimo(populacao, custos)
     if melhorindividuodessageracao[1] < melhorindividuo[1]:
