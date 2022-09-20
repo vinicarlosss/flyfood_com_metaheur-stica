@@ -150,59 +150,25 @@ def cruzamento(individuos):
                 if paium[contadordois] not in filhoum: # se o gene do pai não estiver no filho, adicione
                     filhoum[contadordois] = paium[contadordois]
                 else:  # se não estiver procure nos mapeamentos
-                    for i in mapeamentos:
-                        if i[0] == paium[contadordois]:
-                            referencia = i[1]
-                            if referencia not in filhoum:
-                                filhoum[contadordois] = referencia
-                            else:
-                                index = 0
-                                mapeamentos2 = mapeamentos.copy()
-                                mapeamentos2.remove(i)
-                                while True:
-                                    if mapeamentos2[index][0] == referencia and mapeamentos2[index][1] not in filhoum:
-                                        filhoum[contadordois] = mapeamentos2[index][1]
-                                        break
-                                    elif mapeamentos2[index][1] == referencia and mapeamentos2[index][0] not in filhoum:
-                                        filhoum[contadordois] = mapeamentos2[index][0]
-                                        break
-                                    elif mapeamentos2[index][0] == referencia and mapeamentos2[index][0] in filhoum:
-                                        referencia = mapeamentos2[index][1]
-                                        mapeamentos2.remove(mapeamentos2[index])
-                                        index = -1
-                                    elif mapeamentos2[index][1] == referencia and mapeamentos2[index][1] in filhoum:
-                                        referencia = mapeamentos2[index][0]
-                                        mapeamentos2.remove(mapeamentos2[index])
-                                        index = -1
-                                index += 1
+                    index = 0
+                    mapeamentos2 = mapeamentos.copy()
+                    referencia = paium[contadordois]
+                    while True:
+                        if mapeamentos2[index][0] == referencia and mapeamentos2[index][1] not in filhoum:
+                            filhoum[contadordois] = mapeamentos2[index][1]
                             break
-                        elif i[1] == paium[contadordois]:
-                            referencia = i[0]
-                            if referencia not in filhoum:
-                                filhoum[contadordois] = referencia
-                            else:
-                                index = 0
-                                mapeamentos2 = mapeamentos.copy()
-                                mapeamentos2.remove(i)
-                                while True:
-                                    if mapeamentos2[index][0] == referencia and mapeamentos2[index][1] not in filhoum:
-                                        filhoum[contadordois] = mapeamentos2[index][1]
-                                        break
-                                    elif mapeamentos2[index][1] == referencia and mapeamentos2[index][0] not in filhoum:
-                                        filhoum[contadordois] = mapeamentos2[index][0]
-                                        break
-                                    elif mapeamentos2[index][0] == referencia and mapeamentos2[index][0] in filhoum:
-                                        referencia = mapeamentos2[index][1]
-                                        mapeamentos2.remove(mapeamentos2[index])
-                                        index = -1
-                                    elif mapeamentos2[index][1] == referencia and mapeamentos2[index][1] in filhoum:
-                                        referencia = mapeamentos2[index][0]
-                                        mapeamentos2.remove(mapeamentos2[index])
-                                        index = -1
-
-                                    index += 1
+                        elif mapeamentos2[index][1] == referencia and mapeamentos2[index][0] not in filhoum:
+                            filhoum[contadordois] = mapeamentos2[index][0]
                             break
-
+                        elif mapeamentos2[index][0] == referencia and mapeamentos2[index][0] in filhoum:
+                            referencia = mapeamentos2[index][1]
+                            mapeamentos2.remove(mapeamentos2[index])
+                            index = -1
+                        elif mapeamentos2[index][1] == referencia and mapeamentos2[index][1] in filhoum:
+                            referencia = mapeamentos2[index][0]
+                            mapeamentos2.remove(mapeamentos2[index])
+                            index = -1
+                        index += 1
             contadordois += 1
         contadordois = 0
         while contadordois < len(filhodois): # filho 2
@@ -210,57 +176,25 @@ def cruzamento(individuos):
                 if paidois[contadordois] not in filhodois: # se o gene do pai dois não estiver no filho dois, adicione
                     filhodois[contadordois] = paidois[contadordois]
                 else: # se o gene já estiver no filho dois, procure nos mapeamentos com qual gene esse gene foi mapeado no ponto de corte
-                    for i in mapeamentos:
-                        if i[0] == paidois[contadordois]: # se o primeiro item dos mapeamentos é igual o gene que está sendo procurado a referência é o outro item
-                            referencia = i[1]
-                            if referencia not in filhodois: # se a referencia não estiver no filho dois, adicione ele
-                                filhodois[contadordois] = referencia
-                            else: # se estiver no filho dois vamos procurar nos mapeamentos novamente o gene mapeado com a referência
-                                index = 0
-                                mapeamentos2 = mapeamentos.copy()
-                                mapeamentos2.remove(i)
-                                while True:
-                                    if mapeamentos2[index][0] == referencia and mapeamentos2[index][1] not in filhodois:
-                                        filhodois[contadordois] = mapeamentos2[index][1]
-                                        break
-                                    elif mapeamentos2[index][1] == referencia and mapeamentos2[index][0] not in filhodois:
-                                        filhodois[contadordois] = mapeamentos2[index][0]
-                                        break
-                                    elif mapeamentos2[index][0] == referencia and mapeamentos2[index][0] in filhodois:
-                                        referencia = mapeamentos2[index][1]
-                                        mapeamentos2.remove(mapeamentos2[index])
-                                        index = -1
-                                    elif mapeamentos2[index][1] == referencia and mapeamentos2[index][1] in filhodois:
-                                        referencia = mapeamentos2[index][0]
-                                        mapeamentos2.remove(mapeamentos2[index])
-                                        index = -1
-                                    index += 1
+                    index = 0
+                    mapeamentos2 = mapeamentos.copy()
+                    referencia = paidois[contadordois]
+                    while True:
+                        if mapeamentos2[index][0] == referencia and mapeamentos2[index][1] not in filhodois:
+                            filhodois[contadordois] = mapeamentos2[index][1]
                             break
-                        elif i[1] == paidois[contadordois]:
-                            referencia = i[0]
-                            if referencia not in filhodois:
-                                filhodois[contadordois] = referencia
-                            else:
-                                index = 0
-                                mapeamentos2 = mapeamentos.copy()
-                                mapeamentos2.remove(i)
-                                while True:
-                                    if mapeamentos2[index][0] == referencia and mapeamentos2[index][1] not in filhodois:
-                                        filhodois[contadordois] = mapeamentos2[index][1]
-                                        break
-                                    elif mapeamentos2[index][1] == referencia and mapeamentos2[index][0] not in filhodois:
-                                        filhodois[contadordois] = mapeamentos2[index][0]
-                                        break
-                                    elif mapeamentos2[index][0] == referencia and mapeamentos2[index][0] in filhodois:
-                                        referencia = mapeamentos2[index][1]
-                                        mapeamentos2.remove(mapeamentos2[index])
-                                        index = -1
-                                    elif mapeamentos2[index][1] == referencia and mapeamentos2[index][1] in filhodois:
-                                        referencia = mapeamentos2[index][0]
-                                        mapeamentos2.remove(mapeamentos2[index])
-                                        index = -1
-                                    index += 1
+                        elif mapeamentos2[index][1] == referencia and mapeamentos2[index][0] not in filhodois:
+                            filhodois[contadordois] = mapeamentos2[index][0]
                             break
+                        elif mapeamentos2[index][0] == referencia and mapeamentos2[index][0] in filhodois:
+                            referencia = mapeamentos2[index][1]
+                            mapeamentos2.remove(mapeamentos2[index])
+                            index = -1
+                        elif mapeamentos2[index][1] == referencia and mapeamentos2[index][1] in filhodois:
+                            referencia = mapeamentos2[index][0]
+                            mapeamentos2.remove(mapeamentos2[index])
+                            index = -1
+                        index += 1
             contadordois += 1
         individuosfilhos.append(filhoum)
         individuosfilhos.append(filhodois)
