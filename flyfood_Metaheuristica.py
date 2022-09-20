@@ -1,6 +1,6 @@
 import random
+from matplotlib import pyplot as plt
 from functools import  reduce
-
 
 def modulo(termOne, termTwo):  # Função para determinar o módulo das distâncias
     resultado = termOne - termTwo
@@ -71,20 +71,17 @@ def funcaoAptidao(custos, individuos):  # função para calcular a aptidão dos 
 def soma(a,b):
     return a+b
 
-def trataNumero(numero):
-    subtraendo = numero.__floor__()
-    if numero - subtraendo >= 0.75:
-        return numero.__ceil__()
-    return numero.__floor__()
-
 
 def roleta(aptidao, individuos):  # função para seleção dos indivíduos que vão se reproduzir
     opcoesroleta = [0 for _ in range(100)]
     total = reduce(soma, aptidao)
     percentuais = [0 for _ in range(len(individuos))]
-    for i in range(len(aptidao)):
-        valorPercentual = ((aptidao[i]/total)*100)
-        percentuais[i] = trataNumero(valorPercentual)
+    if total != 0:
+        for i in range(len(aptidao)):
+            percentuais[i] = ((aptidao[i]/total)*100).__floor__()
+    else:
+        for i in range(len(aptidao)):
+            percentuais[i] = (100/len(aptidao)).__floor__()
 
     index = 0
     contador = 0
@@ -93,6 +90,8 @@ def roleta(aptidao, individuos):  # função para seleção dos indivíduos que 
         if index == len(individuos):
             break
         elif percentuais[index] != 0:
+            if contador ==100:
+                break
             for i in range(percentuais[index]):
                 opcoesroleta[contador] = individuos[index]
                 contador += 1
@@ -116,7 +115,7 @@ def cruzamento(individuos):
     individuosfilhos = []
     contador = 0
     listaparceiros = [0 for _ in range(int(len(individuos)/2))]
-    while True:
+    while True: # dividir a lista de individuos selecionados em duas listas para fazer o crossover com o pmx
         if contador == len(listaparceiros):
             break
         else:
@@ -272,8 +271,8 @@ def cruzamento(individuos):
 
 def mutacao(individuos):
     for i in individuos:
-        taxamutacao = random.randint(1,10)
-        if taxamutacao > 7:
+        taxamutacao = round(random.uniform(1,10), 2)
+        if taxamutacao > 9.5:
             primeirogene = random.randint(0, len(i)-1)
             segundogene = random.randint(0, len(i) - 1)
             geneescolhido = i[primeirogene]
@@ -281,11 +280,65 @@ def mutacao(individuos):
             i[segundogene] = geneescolhido
     return individuos
 
+def elistismo(individuos, custos):
+    melhoresindividuos = []
+    for i in range(len(individuos)):
+        if i == 0:
+            topum = i
+            topdois = i+1
+            toptres = i + 2
+            topquatro = i + 3
+        else:
+            if custos[i] < custos[topum]:
+                topum = i
+            elif custos[i] < custos[topdois]:
+                topdois = i
+            elif custos[i] < custos[toptres]:
+                toptres = i
+            elif custos[i] < custos[topquatro]:
+                topquatro = i
+    melhoresindividuos.append([individuos[topum],custos[topum]])
+    melhoresindividuos.append([individuos[topdois], custos[topdois]])
+    melhoresindividuos.append([individuos[toptres], custos[toptres]])
+    melhoresindividuos.append([individuos[topquatro], custos[topquatro]])
+    return melhoresindividuos
+
+
+def trocarOsPioresPorElitismo(individuos, custos, elistismo):
+    for i in range(len(individuos)):
+        if i == 0:
+            topum = i
+            topdois = i+1
+            toptres = i + 2
+            topquatro = i + 3
+        else:
+            if custos[i] > custos[topum]:
+                topum = i
+            elif custos[i] > custos[topdois]:
+                topdois = i
+            elif custos[i] > custos[toptres]:
+                toptres = i
+            elif custos[i] > custos[topquatro]:
+                topquatro = i
+    if custos[topum] > elistismo[0][1]:
+        individuos[topum] = elistismo[0][0]
+        custos[topum] = elistismo[0][1]
+    if custos[topdois] > elistismo[1][1]:
+        individuos[topdois] = elistismo[1][0]
+        custos[topdois] = elistismo[1][1]
+    if custos[toptres] > elistismo[2][1]:
+        individuos[toptres] = elistismo[2][0]
+        custos[toptres] = elistismo[2][1]
+    if custos[topquatro] > elistismo[3][1]:
+        individuos[topquatro] = elistismo[3][0]
+        custos[topquatro] = elistismo[3][1]
+
+
 
 def criarPopulacaoInicial(individuos):  # função de criação da população inicial
-    populacao = [[0 for _ in range(len(individuos))] for _ in range(10)]
+    populacao = [[0 for _ in range(len(individuos))] for _ in range(100)]
     contador = 0
-    while contador < 10:
+    while contador < 100: # para uma população de n individuos, sempre copiar a lista de individuos e ir criando os individuos aleatoriamente
         copiaIndividuos = individuos.copy()
         for i in range(len(individuos)):
             index = random.randint(0, len(copiaIndividuos) - 1)
@@ -296,6 +349,32 @@ def criarPopulacaoInicial(individuos):  # função de criação da população i
     return populacao
 
 
+def checaMinimo(individuos,custo):
+    for i in range(len(individuos)):
+        if i ==0:
+            topum = i
+        else:
+            if custo[i] < custo[topum]:
+                topum = i
+    return [individuos[topum],custo[topum]]
+
+
+def mostrarResultado(melhorindividuo):
+    print("O melhor circuito para fazer as entregas é: " + ' '.join(
+        melhorindividuo[0]) + f' Com custo de {melhorindividuo[1]}')
+    x = []
+    y = []
+    x.append(coordenadas['R'][0])
+    y.append(coordenadas['R'][1])
+    for i in melhorindividuo[0]:
+        x.append(coordenadas[f'{i}'][0])
+        y.append(coordenadas[f'{i}'][1])
+    x.append(coordenadas['R'][0])
+    y.append(coordenadas['R'][1])
+    plt.plot(x, y)
+    plt.plot(x, y, ".")
+    plt.show()
+
 arquivo = open('matriz.txt', 'r')
 pontos_entrega = []  # array para armazenar os pontos de entrega
 circuitos = []  # array para armazenar todos os possíveis circuitos a serem realizados
@@ -304,8 +383,12 @@ contador = 0
 for linha in arquivo:
     linha = linha.replace(" ", "")
     if contador == 0:  # definindo o número de linhas e colunas da matriz
-        n = int(linha[0])
-        m = int(linha[1])
+        if len(linha ) > 3:
+            n, m= linha[0] + linha[1], linha[2] + linha[3]
+            n,m = int(n), int(m)
+        else:
+            n = int(linha[0])
+            m = int(linha[1])
     elif contador <= n:
         for i in linha:  # verificando linha por linha do arquivo onde estão localizados os pontos de entrega
             if i == 'R':
@@ -319,22 +402,37 @@ arquivo.close()
 populacaoInicial = criarPopulacaoInicial(pontos_entrega)
 custos = funcaoCusto(populacaoInicial, coordenadas, modulo, distancia)
 aptidao = funcaoAptidao(custos, populacaoInicial)
-individuosparareproduzir = roleta(aptidao, populacaoInicial)
-print(reduce(soma, custos))
+individuosparareproduzir = roleta(aptidao, populacaoInicial.copy())
+individuoscruzados = cruzamento(individuosparareproduzir.copy())
+individuosmutados = mutacao(individuoscruzados.copy())
 contador = 0
-individuoscruzados = cruzamento(individuosparareproduzir)
-individuosmutados = mutacao(individuoscruzados)
-while contador < 20:
+gereacoessemindividuomelhor = 0
+melhorindividuo = []
+while True:
+
     populacao = individuosmutados
     custos = funcaoCusto(populacao, coordenadas, modulo, distancia)
     aptidao = funcaoAptidao(custos, populacao)
-    individuosparareproduzir = roleta(aptidao, populacao)
-    individuoscruzados = cruzamento(individuosparareproduzir)
-    individuosmutados = mutacao(individuoscruzados)
-    print(reduce(soma, custos))
+    individuosparareproduzir = roleta(aptidao, populacao.copy())
+    individuoscruzados = cruzamento(individuosparareproduzir.copy())
+    individuosmutados = mutacao(individuoscruzados.copy())
+    custos = funcaoCusto(populacao, coordenadas, modulo, distancia)
+    if contador > 0:
+        trocarOsPioresPorElitismo(individuosmutados, custos, individuossuperdotados)
+        if contador == 1:
+            melhorindividuo = checaMinimo(populacao, custos)
+        else:
+            melhorindividuodessageracao = checaMinimo(populacao, custos)
+            if melhorindividuodessageracao[1] < melhorindividuo[1]:
+                gereacoessemindividuomelhor = 0
+                melhorindividuo = melhorindividuodessageracao
+            else:
+                gereacoessemindividuomelhor += 1
+            if gereacoessemindividuomelhor == 100:
+                mostrarResultado(melhorindividuo)
+                break
+    individuossuperdotados = elistismo(individuosmutados,custos)
     contador += 1
-
-
 
 
 
